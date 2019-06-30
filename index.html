@@ -180,15 +180,31 @@
             // Update the modal's content. We'll use jQuery here, but you could use a data binding library or other methods instead.
             let modal = $(this);
             modal.find('.modal-title').text(recipient);
-            // modal.find('.modal-body input').val(recipient)
         })
     });
 
     function sendForm() {
         if (phonenum.checkValidity()) {
-            $('#call-me').modal('hide');
+            let phone = $('#phonenum')[0].value;
+            let msg = $('#message-text')[0].value;
+            $.ajax({
+                url: "/ajax/contact.php",
+                type: 'POST',
+                data: {
+                    phone: phone,
+                    msg: msg,
+                },
+                success: function(response, textStatus, jqXHR) {
+                    $('.alert-success').show();
+                    setTimeout(function () {
+                        $('#call-me').modal('hide');
+                    }, 100)
+                },
+                error: function(jqXHR, textStatus, errorThrown){
+                    $('.alert-danger').show();
+                }
+            });
         }
-
     }
 
 
@@ -215,7 +231,7 @@
                         <textarea class="form-control" id="message-text"></textarea>
                     </div>
                     <div class="modal-footer">
-                        <button type="submit" class="btn btn-success" onclick="sendForm()">Отправить</button>
+                        <button type="button" class="btn btn-success" onclick="sendForm()">Отправить</button>
                         <button type="button" class="btn btn-secondary" data-dismiss="modal">Закрыть</button>
                     </div>
                 </form>
@@ -224,5 +240,16 @@
         </div>
     </div>
 </div>
+
+<div class="alert alert-success alert-dismissable">
+    <button type="button" class="close" data-dismiss="alert" aria-hidden="true">&times;</button>
+    Благодарим! В ближайшее время мы с Вами свяжемся!
+</div>
+
+<div class="alert alert-danger alert-dismissable">
+    <button type="button" class="close" data-dismiss="alert" aria-hidden="true">&times;</button>
+    Ошибка! Заявка не отправлена. Сообщите нам, пожалуйста, об ошибке по контактам, указанным на сайте. Спасибо!
+</div>
+
 </body>
 </html>
