@@ -139,8 +139,16 @@
         integrity="sha384-JjSmVgyd0p3pXB1rRibZUAYoIIy6OrQ6VrjIEaFf/nJGzIxFDsf4x0xIM+B07jRM"
         crossorigin="anonymous"></script>
 
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jquery.inputmask/3.3.4/inputmask/inputmask.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jquery.inputmask/3.3.4/inputmask/jquery.inputmask.js"></script>
+
+
 <script>
+
     $(document).ready(function () {
+         $('#phonenum').inputmask("8(999)999-99-99");
+
         setInterval(function () {
             $('.mobile-navbar>.brand-name').addClass('blink_on');
             setTimeout(function () {
@@ -184,7 +192,10 @@
     });
 
     function sendForm() {
-        if (phonenum.checkValidity()) {
+
+        if (phonenum.checkValidity() && $('#phonenum')[0].value.search('_') === -1) {
+
+            $('#phonenum').removeClass('is-invalid');
             let phone = $('#phonenum')[0].value;
             let msg = $('#message-text')[0].value;
             $.ajax({
@@ -194,17 +205,23 @@
                     phone: phone,
                     msg: msg,
                 },
-                success: function(response, textStatus, jqXHR) {
+                success: function (response, textStatus, jqXHR) {
                     $('.alert-success').show();
                     setTimeout(function () {
                         $('#call-me').modal('hide');
-                    }, 100)
+                    }, 100);
+                    $('#phonenum')[0].value = '';
+                    $('#message-text')[0].value = '';
                 },
-                error: function(jqXHR, textStatus, errorThrown){
+                error: function (jqXHR, textStatus, errorThrown) {
                     $('.alert-danger').show();
                 }
             });
+
+        } else {
+            $('#phonenum').addClass('is-invalid');
         }
+
     }
 
 
@@ -221,17 +238,17 @@
                 </button>
             </div>
             <div class="modal-body">
-                <form>
+                <form id="formCallMe" action="javascript:sendForm()">
                     <div class="form-group">
-                        <label for="phonenum">Телефон (в формате 8-xxx-xxx-xxxx):</label><br/>
-                        <input class="form-control" id="phonenum" type="tel" pattern="^8-\d{3}-\d{3}-\d{4}$" required>
+                        <label for="phonenum">Телефон (обязательное поле)</label><br/>
+                        <input class="form-control" id="phonenum" pattern=".{6,}" type="tel" required>
                     </div>
                     <div class="form-group">
                         <label for="message-text" class="col-form-label">Комментарий</label>
                         <textarea class="form-control" id="message-text"></textarea>
                     </div>
                     <div class="modal-footer">
-                        <button type="button" class="btn btn-success" onclick="sendForm()">Отправить</button>
+                        <button type="submit" class="btn btn-success">Отправить</button>
                         <button type="button" class="btn btn-secondary" data-dismiss="modal">Закрыть</button>
                     </div>
                 </form>
